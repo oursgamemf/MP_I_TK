@@ -5,6 +5,7 @@
  */
 package com.gamedevelopermf.controller;
 
+import checkinputdata.DateChecker;
 import com.sun.org.apache.xpath.internal.operations.Equals;
 import static com.gamedevelopermf.controller.ManageExcel.getColNumFromTxt;
 import static com.gamedevelopermf.controller.ManageExcel.getHeaderList;
@@ -201,7 +202,8 @@ public class TickerController {
                 Integer col = getColNumFromTxt(h, datas);
                 switch (h.toLowerCase().trim()) {
                     case "date":
-                        Date dateVal = Date.valueOf(datas.get(row).get(col));
+                        String tempData = DateChecker.checkData(datas.get(row).get(col).toString());
+                        Date dateVal = Date.valueOf(tempData);
                         myRowTicker.setDateTk(dateVal);
                         break;
                     case "open":
