@@ -41,6 +41,9 @@ import javax.swing.JTextField;
 import yahoofinance.Stock;
 import yahoofinance.YahooFinance;
 import yahoofinance.histquotes.Interval;
+import static com.gamedevelopermf.controller.ManageExcel.getAllDataFromFile;
+import static com.gamedevelopermf.controller.ManageExcel.getAllDataFromFile;
+import static com.gamedevelopermf.controller.ManageExcel.getAllDataFromFile;
 
 /**
  * @author emanuele
@@ -109,7 +112,7 @@ public class TickerController {
         return google;
     }
 
-    public static Stock yahooAPI(String nameTk) throws IOException {
+    public static Stock yahooAPI_MONTH(String nameTk) throws IOException {
         Calendar from = Calendar.getInstance();
         Calendar to = Calendar.getInstance();
         //from.add(Calendar.YEAR, -10); // from 5 years ago
@@ -122,6 +125,38 @@ public class TickerController {
         System.out.println("!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
          */
         Stock google = YahooFinance.get(nameTk, from, to, Interval.MONTHLY);
+        return google;
+    }
+
+    public static Stock yahooAPI_WEEK(String nameTk) throws IOException {
+        Calendar from = Calendar.getInstance();
+        Calendar to = Calendar.getInstance();
+        //from.add(Calendar.YEAR, -10); // from 5 years ago
+        from.set(1800, 01, 01);
+        //from.set(2016, 01, 01);
+        /*
+        System.out.println("!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
+        System.out.println(from.getTime().toString());
+        System.out.println(to.getTime().toString());
+        System.out.println("!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
+         */
+        Stock google = YahooFinance.get(nameTk, from, to, Interval.WEEKLY);
+        return google;
+    }
+
+    public static Stock yahooAPI_DAY(String nameTk) throws IOException {
+        Calendar from = Calendar.getInstance();
+        Calendar to = Calendar.getInstance();
+        //from.add(Calendar.YEAR, -10); // from 5 years ago
+        from.set(1800, 01, 01);
+        //from.set(2016, 01, 01);
+        /*
+        System.out.println("!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
+        System.out.println(from.getTime().toString());
+        System.out.println(to.getTime().toString());
+        System.out.println("!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
+         */
+        Stock google = YahooFinance.get(nameTk, from, to, Interval.DAILY);
         return google;
     }
 
@@ -446,12 +481,22 @@ public class TickerController {
     public static void searchSaveTK(String fileUrl, String nameTK, JTextField txtField) {
         //Code to download
         InputStream input;
-        String pathNameDwlCSV = insideFullPath + nameTK.trim() + ".csv";
-        File myFile = new File(pathNameDwlCSV);
+        String pathNameDwlCSV_MONTH = insideFullPath + nameTK.trim() + "_M.csv";
+        String pathNameDwlCSV_WEEK = insideFullPath + nameTK.trim() + "_W.csv";
+        String pathNameDwlCSV_DAY = insideFullPath + nameTK.trim() + "_D.csv";
+        File myFile = new File(pathNameDwlCSV_MONTH);
         try {
-            Stock myTKdatas = yahooAPI(nameTK);
-            List<String[]> outputdata = getMatrixData(myTKdatas);
-            writeCSV(pathNameDwlCSV, outputdata);
+            Stock myTKdatas_M = yahooAPI_MONTH(nameTK);
+            List<String[]> outputdata_M = getMatrixData(myTKdatas_M);
+            writeCSV(pathNameDwlCSV_MONTH, outputdata_M);
+            
+            Stock myTKdatas_W = yahooAPI_WEEK(nameTK);
+            List<String[]> outputdata_W = getMatrixData(myTKdatas_W);
+            writeCSV(pathNameDwlCSV_WEEK, outputdata_W);
+            
+            Stock myTKdatas_D = yahooAPI_DAY(nameTK);
+            List<String[]> outputdata_D = getMatrixData(myTKdatas_D);
+            writeCSV(pathNameDwlCSV_DAY, outputdata_D);
 
         } catch (IOException ex) {
             Logger.getLogger(TickerController.class
@@ -483,7 +528,7 @@ public class TickerController {
             @Override
             public int compare(RowTicker o1, RowTicker o2) {
                 return o1.getDateTk().compareTo(o2.getDateTk());
-            }          
+            }
         };
         return comp;
     }
