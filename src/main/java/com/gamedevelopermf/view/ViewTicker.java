@@ -373,6 +373,7 @@ public class ViewTicker extends javax.swing.JFrame {
 //            ManageExcel.createExcel(myTicker, outputExcelFile, tickerName);
             boolean fileAlreadyExists = checkIfExists(tkName, outputExcelFile);
             if (fileAlreadyExists) {
+                /// !!! MODIFICA QUI E SOTTO !!! ///
                 ManageExcel.modifyExcel(mySortedTicker, outputExcelFile, tkName, jTextField3);
             } else {
                 ManageExcel.createExcel(mySortedTicker, outputExcelFile, tkName, jTextField3);
