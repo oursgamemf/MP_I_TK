@@ -202,10 +202,16 @@ public class ManageExcel {
         }
     }
 
-    public static void createExcel(ArrayList<RowTicker> myTicker, String userSavePath, String fileName, JTextField txtField) {
+    public static void createExcel(ArrayList<RowTicker> myTickerDaily,ArrayList<RowTicker> myTickerWeekly,ArrayList<RowTicker> myTicker, String userSavePath, String fileName, JTextField txtField) {
         Workbook myWb = new XSSFWorkbook();
         CreationHelper myCreateHelper = myWb.getCreationHelper();
-
+        
+        String myDailiySheetName = "Giornaliero";
+        addSheet2Excel(myWb, myCreateHelper, myDailiySheetName, myTickerDaily);
+        
+        String myWeeklySheetName = "Settimanale";
+        addSheet2Excel(myWb, myCreateHelper, myWeeklySheetName, myTickerWeekly);
+        
         String mySheetName = "Mensile";
         addSheet2Excel(myWb, myCreateHelper, mySheetName, myTicker);
 
@@ -256,7 +262,7 @@ public class ManageExcel {
         return exists;
     }
 
-    public static void modifyExcel(ArrayList<RowTicker> myTicker, String userSavePath, String fileName, JTextField txtField) {
+    public static void modifyExcel(ArrayList<RowTicker> myTickerDaily,ArrayList<RowTicker> myTickerWeekly,ArrayList<RowTicker> myTicker, String userSavePath, String fileName, JTextField txtField) {
 
         String inputFilePath = userSavePath + File.separator + fileName + ".xlsx";
         FileInputStream file = null;
@@ -275,17 +281,23 @@ public class ManageExcel {
         }
 
         CreationHelper myCrHelper = workbook.getCreationHelper();
+        
+        XSSFSheet mySheet0 = workbook.getSheet("Giornaliero");
+        modifySheet2Excel(workbook, myCrHelper, mySheet0, myTickerDaily);
+        
+        XSSFSheet mySheet1 = workbook.getSheet("Settimanale");
+        modifySheet2Excel(workbook, myCrHelper, mySheet1, myTickerWeekly);
+        
+        XSSFSheet mySheet2 = workbook.getSheet("Mensile");
+        modifySheet2Excel(workbook, myCrHelper, mySheet2, myTicker);
 
-        XSSFSheet mySheet = workbook.getSheet("Mensile");
-        modifySheet2Excel(workbook, myCrHelper, mySheet, myTicker);
-
-        XSSFSheet mySheet1 = workbook.getSheet("Trimestrale");
+        XSSFSheet mySheet3 = workbook.getSheet("Trimestrale");
         ArrayList<RowTicker> myQuarterTicker = getQuarterlyTicker(myTicker);
-        modifySheet2Excel(workbook, myCrHelper, mySheet1, myQuarterTicker);
+        modifySheet2Excel(workbook, myCrHelper, mySheet3, myQuarterTicker);
 
-        XSSFSheet mySheet2 = workbook.getSheet("Annuale");
+        XSSFSheet mySheet4 = workbook.getSheet("Annuale");
         ArrayList<RowTicker> myAnnualTicker = getAnnualTicker(myTicker);
-        modifySheet2Excel(workbook, myCrHelper, mySheet2, myAnnualTicker);
+        modifySheet2Excel(workbook, myCrHelper, mySheet4, myAnnualTicker);
 
         XSSFFormulaEvaluator.evaluateAllFormulaCells(workbook);
         try {
