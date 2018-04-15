@@ -358,6 +358,16 @@ public class ViewTicker extends javax.swing.JFrame {
         if (isWebConn) {
             String myTKs = TickerController.makeURL(tkName);
             TickerController.searchSaveTK(myTKs, tkName, jTextField3);
+            // get Ticker object with daily datas
+            ArrayList<ArrayList<String>> data_D = getAllDataFromTKFile(tkName + "_D", ',');
+            System.out.println(tkName + "_D");
+            ArrayList<RowTicker> myTicker_D = getRowTickerArray(data_D);
+            ArrayList<RowTicker> mySortedTicker_D = sortTicker(myTicker_D);
+            // get Ticker object with weekly datas
+            ArrayList<ArrayList<String>> data_W = getAllDataFromTKFile(tkName + "_W", ',');
+            ArrayList<RowTicker> myTicker_W = getRowTickerArray(data_W);
+            ArrayList<RowTicker> mySortedTicker_W = sortTicker(myTicker_W);
+            // get Ticker object with monthly datas
             ArrayList<ArrayList<String>> data = getAllDataFromTKFile(tkName, ',');
             ArrayList<RowTicker> myTicker = getRowTickerArray(data);
             ArrayList<RowTicker> mySortedTicker = sortTicker(myTicker);
@@ -373,10 +383,9 @@ public class ViewTicker extends javax.swing.JFrame {
 //            ManageExcel.createExcel(myTicker, outputExcelFile, tickerName);
             boolean fileAlreadyExists = checkIfExists(tkName, outputExcelFile);
             if (fileAlreadyExists) {
-                /// !!! MODIFICA QUI E SOTTO !!! ///
-                ManageExcel.modifyExcel(mySortedTicker, outputExcelFile, tkName, jTextField3);
+                ManageExcel.modifyExcel(mySortedTicker_D, mySortedTicker_W, mySortedTicker, outputExcelFile, tkName, jTextField3);
             } else {
-                ManageExcel.createExcel(mySortedTicker, outputExcelFile, tkName, jTextField3);
+                ManageExcel.createExcel(mySortedTicker_D, mySortedTicker_W, mySortedTicker, outputExcelFile, tkName, jTextField3);
                 //TickerController.addTkChoosenInOBJ();
             }
 
@@ -393,6 +402,15 @@ public class ViewTicker extends javax.swing.JFrame {
         if (isWebConn) {
             String myTKs = TickerController.makeURL(tkName);
             TickerController.searchSaveTK(myTKs, tkName, jTextField3);
+            // GEt ticker with daily data
+            ArrayList<ArrayList<String>> data_D = getAllDataFromTKFile(tkName+"_D", ',');
+            ArrayList<RowTicker> myTicker_D = getRowTickerArray(data_D);
+            ArrayList<RowTicker> mySortedTicker_D = sortTicker(myTicker_D);
+            // GEt ticker with weekly data
+            ArrayList<ArrayList<String>> data_W = getAllDataFromTKFile(tkName+"_W", ',');
+            ArrayList<RowTicker> myTicker_W = getRowTickerArray(data_W);
+            ArrayList<RowTicker> mySortedTicker_W = sortTicker(myTicker_W);
+            // GEt ticker with montlyy data
             ArrayList<ArrayList<String>> data = getAllDataFromTKFile(tkName, ',');
             ArrayList<RowTicker> myTicker = getRowTickerArray(data);
             ArrayList<RowTicker> mySortedTicker = sortTicker(myTicker);
@@ -408,9 +426,9 @@ public class ViewTicker extends javax.swing.JFrame {
             // Update last download
             boolean fileAlreadyExists = checkIfExists(tkName, outputExcelFile);
             if (fileAlreadyExists) {
-                ManageExcel.modifyExcel(mySortedTicker, outputExcelFile, tkName, jTextField3);
+                ManageExcel.modifyExcel(mySortedTicker_D, mySortedTicker_W, mySortedTicker, outputExcelFile, tkName, jTextField3);
             } else {
-                ManageExcel.createExcel(mySortedTicker, outputExcelFile, tkName, jTextField3);
+                ManageExcel.createExcel(mySortedTicker_D, mySortedTicker_W,mySortedTicker, outputExcelFile, tkName, jTextField3);
                 //TickerController.addTkChoosenInOBJ();
             }
 
@@ -469,8 +487,8 @@ public class ViewTicker extends javax.swing.JFrame {
                 int col = cols[0];
                 int row = rows[0];
                 // Inserite i dati della riga nell'oggetto
-                RowChoosenTks newRowChoosTks = createRCTfromRowint(row,col);
-                if (newRowChoosTks == null){
+                RowChoosenTks newRowChoosTks = createRCTfromRowint(row, col);
+                if (newRowChoosTks == null) {
                     fillTableFromDB(choosedTKTable, myStmtDB, myTable);
                     return;
                 }
@@ -538,11 +556,11 @@ public class ViewTicker extends javax.swing.JFrame {
      */
     /*public static void main(String args[]) {
         /* Set the Nimbus look and feel */
-        //new SelfDownloadCaller("Update Called", 10, tableDBName,  myStmtDB, this);
-        //<editor-fold defaultstate="collapsed" desc=" Look and feel setting code (optional) ">
-        /* If Nimbus (introduced in Java SE 6) is not available, stay with the default look and feel.
+    //new SelfDownloadCaller("Update Called", 10, tableDBName,  myStmtDB, this);
+    //<editor-fold defaultstate="collapsed" desc=" Look and feel setting code (optional) ">
+    /* If Nimbus (introduced in Java SE 6) is not available, stay with the default look and feel.
          * For details see http://download.oracle.com/javase/tutorial/uiswing/lookandfeel/plaf.html
-         *//*
+     *//*
         try {
             for (javax.swing.UIManager.LookAndFeelInfo info : javax.swing.UIManager.getInstalledLookAndFeels()) {
                 if ("Nimbus".equals(info.getName())) {
@@ -568,7 +586,7 @@ public class ViewTicker extends javax.swing.JFrame {
         });
         
     }
-    */
+     */
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton jButton1;
     private javax.swing.JButton jButton2;

@@ -25,8 +25,14 @@ import java.util.HashSet;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.JTextField;
+import org.apache.poi.EncryptedDocumentException;
+import org.apache.poi.openxml4j.exceptions.InvalidFormatException;
+import org.apache.poi.openxml4j.util.ZipSecureFile;
+import org.apache.poi.ss.SpreadsheetVersion;
 import org.apache.poi.ss.usermodel.CreationHelper;
+import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
+import org.apache.poi.ss.usermodel.WorkbookFactory;
 import org.apache.poi.xssf.usermodel.XSSFFormulaEvaluator;
 import org.apache.poi.xssf.usermodel.XSSFSheet;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
@@ -202,16 +208,16 @@ public class ManageExcel {
         }
     }
 
-    public static void createExcel(ArrayList<RowTicker> myTickerDaily,ArrayList<RowTicker> myTickerWeekly,ArrayList<RowTicker> myTicker, String userSavePath, String fileName, JTextField txtField) {
+    public static void createExcel(ArrayList<RowTicker> myTickerDaily, ArrayList<RowTicker> myTickerWeekly, ArrayList<RowTicker> myTicker, String userSavePath, String fileName, JTextField txtField) {
         Workbook myWb = new XSSFWorkbook();
         CreationHelper myCreateHelper = myWb.getCreationHelper();
-        
+
         String myDailiySheetName = "Giornaliero";
         addSheet2Excel(myWb, myCreateHelper, myDailiySheetName, myTickerDaily);
-        
+
         String myWeeklySheetName = "Settimanale";
         addSheet2Excel(myWb, myCreateHelper, myWeeklySheetName, myTickerWeekly);
-        
+
         String mySheetName = "Mensile";
         addSheet2Excel(myWb, myCreateHelper, mySheetName, myTicker);
 
@@ -262,11 +268,14 @@ public class ManageExcel {
         return exists;
     }
 
-    public static void modifyExcel(ArrayList<RowTicker> myTickerDaily,ArrayList<RowTicker> myTickerWeekly,ArrayList<RowTicker> myTicker, String userSavePath, String fileName, JTextField txtField) {
+    public static void modifyExcel(ArrayList<RowTicker> myTickerDaily, ArrayList<RowTicker> myTickerWeekly, ArrayList<RowTicker> myTicker, String userSavePath, String fileName, JTextField txtField) {
 
         String inputFilePath = userSavePath + File.separator + fileName + ".xlsx";
+
         FileInputStream file = null;
         XSSFWorkbook workbook = new XSSFWorkbook();
+        //--//        
+        ZipSecureFile.setMinInflateRatio(0);
         try {
             file = new FileInputStream(inputFilePath);
             workbook = new XSSFWorkbook(file);
@@ -278,49 +287,58 @@ public class ManageExcel {
             System.out.println("Workbook not found in ManageExcel - modifyExcel ");
             String outMessage = "Impossibile leggere il file: \'" + fileName + "\'";
             OutputMessage.setOutputText(outMessage, txtField, 2);
+            Logger.getLogger(ManageExcel.class.getName()).log(Level.SEVERE, null, ex);
+        } 
+        catch (EncryptedDocumentException ex) {
+            Logger.getLogger(ManageExcel.class.getName()).log(Level.SEVERE, null, ex);
         }
-
+        
         CreationHelper myCrHelper = workbook.getCreationHelper();
-        
-        XSSFSheet mySheet0 = workbook.getSheet("Giornaliero");
+
+        System.out.println("--> " + String.valueOf(workbook.getNumberOfSheets()));
+        System.out.println("--> " + userSavePath + fileName);
+
+        Sheet mySheet0 = workbook.getSheet("Giornaliero");
         modifySheet2Excel(workbook, myCrHelper, mySheet0, myTickerDaily);
-        
-        XSSFSheet mySheet1 = workbook.getSheet("Settimanale");
+
+        Sheet mySheet1 = workbook.getSheet("Settimanale");
         modifySheet2Excel(workbook, myCrHelper, mySheet1, myTickerWeekly);
-        
-        XSSFSheet mySheet2 = workbook.getSheet("Mensile");
+
+        Sheet mySheet2 = workbook.getSheet("Mensile");
         modifySheet2Excel(workbook, myCrHelper, mySheet2, myTicker);
 
-        XSSFSheet mySheet3 = workbook.getSheet("Trimestrale");
+        Sheet mySheet3 = workbook.getSheet("Trimestrale");
         ArrayList<RowTicker> myQuarterTicker = getQuarterlyTicker(myTicker);
         modifySheet2Excel(workbook, myCrHelper, mySheet3, myQuarterTicker);
 
-        XSSFSheet mySheet4 = workbook.getSheet("Annuale");
+        Sheet mySheet4 = workbook.getSheet("Annuale");
         ArrayList<RowTicker> myAnnualTicker = getAnnualTicker(myTicker);
         modifySheet2Excel(workbook, myCrHelper, mySheet4, myAnnualTicker);
 
         XSSFFormulaEvaluator.evaluateAllFormulaCells(workbook);
+            
         try {
-            file.close();           
+            file.close();
         } catch (IOException ex) {
             System.out.println("File not found in ManageExcel - modifyExcel - during Close ");
         }
+         
         //
-        File myFile = new File(inputFilePath);       
-        //
-        try (FileOutputStream outFile = new FileOutputStream(myFile)) {
-            workbook.write(outFile);
-            OutputMessage.setOutputText("\'" + fileName + "\' modificato correttamente", txtField);
-        } catch (FileNotFoundException e) {
-            System.out.println("Unable to write the file");
-            String outMessage = "Impossibile modificare il file: \'" + fileName + "\'. Controllare che non sia aperto da un altro programma";
-            OutputMessage.setOutputText(outMessage, txtField, 2);
-        } catch (IOException e) {
-            System.out.println("Unable to write the file I/O Ex");
-            String outMessage = "Impossibile modificare il file: \'" + fileName + "\'. Controllare che non sia aperto da un altro programma";
-            OutputMessage.setOutputText(outMessage, txtField, 2);
-        }
-    
+        File myFile = new File(inputFilePath);
+
+            try (FileOutputStream outFile = new FileOutputStream(myFile)) {
+                workbook.write(outFile);
+                OutputMessage.setOutputText("\'" + fileName + "\' modificato correttamente", txtField);
+            } catch (FileNotFoundException e) {
+                System.out.println("Unable to write the file");
+                String outMessage = "Impossibile modificare il file: \'" + fileName + "\'. Controllare che non sia aperto da un altro programma";
+                OutputMessage.setOutputText(outMessage, txtField, 2);
+            } catch (IOException e) {
+                System.out.println("Unable to write the file I/O Ex");
+                String outMessage = "Impossibile modificare il file: \'" + fileName + "\'. Controllare che non sia aperto da un altro programma";
+                OutputMessage.setOutputText(outMessage, txtField, 2);
+            }
+
     }
 
 }

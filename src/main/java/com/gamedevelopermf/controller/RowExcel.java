@@ -120,10 +120,13 @@ public class RowExcel {
         }
     }
 
-    public static void modifySheet2Excel(Workbook myWb, CreationHelper myCrHelper, XSSFSheet mySheet, ArrayList<RowTicker> myTicker) {
+    public static void modifySheet2Excel(Workbook myWb, CreationHelper myCrHelper, Sheet mySheet, ArrayList<RowTicker> myTicker) {
 
         int row = 1;
         int rowsNum = myTicker.size();
+        //System.out.println("--> " + String.valueOf(rowsNum));
+        //System.out.println("--> " + mySheet.getSheetName());
+        //System.out.println("--> " +mySheet.getLastRowNum());
         boolean isLast;
         for (RowTicker myRowTk : myTicker) {
             isLast = row == rowsNum;
