@@ -5,7 +5,6 @@
  */
 package com.gamedevelopermf.controller;
 
-import com.sun.prism.paint.Color;
 import javax.swing.JTextField;
 
 

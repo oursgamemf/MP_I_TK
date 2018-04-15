@@ -8,7 +8,6 @@ package com.gamedevelopermf.controller;
 import com.opencsv.CSVReader;
 import static com.gamedevelopermf.controller.RowExcel.addSheet2Excel;
 import static com.gamedevelopermf.controller.RowExcel.modifySheet2Excel;
-import static com.gamedevelopermf.controller.TickerController.getRowTickerArray;//??
 import static com.gamedevelopermf.controller.TickerController.getAnnualTicker;
 import static com.gamedevelopermf.controller.TickerController.getQuarterlyTicker;
 import java.io.File;
@@ -26,15 +25,11 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.JTextField;
 import org.apache.poi.EncryptedDocumentException;
-import org.apache.poi.openxml4j.exceptions.InvalidFormatException;
 import org.apache.poi.openxml4j.util.ZipSecureFile;
-import org.apache.poi.ss.SpreadsheetVersion;
 import org.apache.poi.ss.usermodel.CreationHelper;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
-import org.apache.poi.ss.usermodel.WorkbookFactory;
 import org.apache.poi.xssf.usermodel.XSSFFormulaEvaluator;
-import org.apache.poi.xssf.usermodel.XSSFSheet;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 
 /*

@@ -6,14 +6,11 @@
 package com.gamedevelopermf.controller;
 
 import checkinputdata.DateChecker;
-import com.sun.org.apache.xpath.internal.operations.Equals;
 import static com.gamedevelopermf.controller.ManageExcel.getColNumFromTxt;
 import static com.gamedevelopermf.controller.ManageExcel.getHeaderList;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.Reader;
 import java.io.UnsupportedEncodingException;
 import java.net.HttpURLConnection;
 import java.sql.Date;
@@ -27,22 +24,14 @@ import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Calendar;
 import com.gamedevelopermf.model.DBtkEvo;
-import org.apache.commons.io.FileUtils;
-import static com.gamedevelopermf.controller.ManageExcel.getAllDataFromFile;
 import java.io.FileWriter;
-import java.net.URLConnection;
 import java.util.Collections;
 import java.util.Comparator;
-import java.util.Iterator;
 import java.util.List;
-import java.util.Map;
-import java.util.Set;
 import javax.swing.JTextField;
 import yahoofinance.Stock;
 import yahoofinance.YahooFinance;
 import yahoofinance.histquotes.Interval;
-import static com.gamedevelopermf.controller.ManageExcel.getAllDataFromFile;
-import static com.gamedevelopermf.controller.ManageExcel.getAllDataFromFile;
 import static com.gamedevelopermf.controller.ManageExcel.getAllDataFromFile;
 
 /**
