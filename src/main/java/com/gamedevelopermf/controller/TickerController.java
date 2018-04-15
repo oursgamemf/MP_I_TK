@@ -470,7 +470,7 @@ public class TickerController {
     public static void searchSaveTK(String fileUrl, String nameTK, JTextField txtField) {
         //Code to download
         InputStream input;
-        String pathNameDwlCSV_MONTH = insideFullPath + nameTK.trim() + "_M.csv";
+        String pathNameDwlCSV_MONTH = insideFullPath + nameTK.trim() + ".csv";
         String pathNameDwlCSV_WEEK = insideFullPath + nameTK.trim() + "_W.csv";
         String pathNameDwlCSV_DAY = insideFullPath + nameTK.trim() + "_D.csv";
         File myFile = new File(pathNameDwlCSV_MONTH);
