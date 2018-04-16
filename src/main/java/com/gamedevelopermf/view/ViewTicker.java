@@ -352,7 +352,7 @@ public class ViewTicker extends javax.swing.JFrame {
             jButton2.setEnabled(true);
         }
     }
-
+    
     public void downloadTicker(String tkName) {
         Boolean isWebConn = TickerController.getWebConnection();
         if (isWebConn) {

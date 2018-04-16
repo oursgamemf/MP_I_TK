@@ -33,6 +33,8 @@ import yahoofinance.Stock;
 import yahoofinance.YahooFinance;
 import yahoofinance.histquotes.Interval;
 import static com.gamedevelopermf.controller.ManageExcel.getAllDataFromFile;
+import java.text.SimpleDateFormat;
+import yahoofinance.histquotes2.HistoricalDividend;
 
 /**
  * @author emanuele
@@ -149,6 +151,35 @@ public class TickerController {
         return google;
     }
 
+    public static List<HistoricalDividend> getListOfDividends(String nameTk) throws IOException {
+        Calendar from = Calendar.getInstance();
+        Calendar to = Calendar.getInstance();
+        from.set(1800, 01, 01);
+        Stock google = YahooFinance.get(nameTk, from, to, Interval.DAILY);
+        List<HistoricalDividend> dividend = google.getDividendHistory(from, to);
+        return dividend;
+    }
+
+    public static List<ArrayList<String>> getListOfStringFromDividends(List<HistoricalDividend> divs) {
+        if (divs.isEmpty()) {
+            return null;
+        }
+        List<ArrayList<String>> output = new ArrayList<ArrayList<String>>();
+        
+        SimpleDateFormat formatCal = new SimpleDateFormat();
+        String formattedData = new String();
+        for (HistoricalDividend div : divs) {
+            ArrayList<String> stringVect = new ArrayList<String>();
+            formatCal = new SimpleDateFormat("yyyy-MM-dd");
+            formattedData = formatCal.format(div.getDate().getTime());
+            stringVect.add(formattedData);
+            stringVect.add(div.getAdjDividend().toString());
+            output.add(stringVect);
+        }
+
+        return output;
+    }
+
     public static boolean getWebConnection() {
         try {
             //make a URL to a known source
@@ -207,6 +238,7 @@ public class TickerController {
         loadSet.add(configData.get(6).get(1));
         loadSet.add(configData.get(7).get(1));
         loadSet.add(configData.get(8).get(1));
+
         return loadSet;
     }
 
@@ -466,10 +498,34 @@ public class TickerController {
         return false;
     }
 
+    public static boolean writeCSV(String filename, List<ArrayList<String>> sourceData, String[] header) {
+        if (sourceData.get(0).size() != header.length) {
+            System.out.println("-----> " +sourceData.get(0).size());
+            System.out.println("CSV NOT CREATED, header nd data length mismatch");
+            return false;
+        }
+        char DEFAULT_SEPARATOR = ',';
+        try {
+            FileWriter fw = new FileWriter(filename);
+
+            TickerController.writeLine(fw, header, DEFAULT_SEPARATOR, '\n');
+            for (ArrayList<String> st : sourceData) {
+                TickerController.writeLine(fw, st.toArray(new String[0]), DEFAULT_SEPARATOR, '\n');
+            }
+            fw.close();
+            ////////////
+        } catch (IOException ex) {
+            Logger.getLogger(TickerController.class.getName()).log(Level.SEVERE, null, ex);
+            String outMsg = "Impossibile scrivere il file: \'" + "\'. Ticker non valido";
+        }
+        return false;
+    }
+
     // public static void 
     public static void searchSaveTK(String fileUrl, String nameTK, JTextField txtField) {
         //Code to download
         InputStream input;
+        String pathNameDwlCSV_DIV = insideFullPath + nameTK.trim() + "_DIV.csv";
         String pathNameDwlCSV_MONTH = insideFullPath + nameTK.trim() + ".csv";
         String pathNameDwlCSV_WEEK = insideFullPath + nameTK.trim() + "_W.csv";
         String pathNameDwlCSV_DAY = insideFullPath + nameTK.trim() + "_D.csv";
@@ -478,14 +534,27 @@ public class TickerController {
             Stock myTKdatas_M = yahooAPI_MONTH(nameTK);
             List<String[]> outputdata_M = getMatrixData(myTKdatas_M);
             writeCSV(pathNameDwlCSV_MONTH, outputdata_M);
-            
+
             Stock myTKdatas_W = yahooAPI_WEEK(nameTK);
             List<String[]> outputdata_W = getMatrixData(myTKdatas_W);
             writeCSV(pathNameDwlCSV_WEEK, outputdata_W);
-            
+
             Stock myTKdatas_D = yahooAPI_DAY(nameTK);
             List<String[]> outputdata_D = getMatrixData(myTKdatas_D);
             writeCSV(pathNameDwlCSV_DAY, outputdata_D);
+
+            List<ArrayList<String>> divData = getListOfStringFromDividends(getListOfDividends(nameTK));
+            if (divData == null || divData.isEmpty()) {
+                String outMsg = "\'" + nameTK + "\' non ha dividendi.";
+                OutputMessage.setOutputText(outMsg, txtField, 2);
+            }
+            else{
+              String[] head = new String[2];
+              head[0] = "Data";
+              head[1] = "Dividendo";
+              writeCSV(pathNameDwlCSV_DIV,divData,head);
+            }
+            //
 
         } catch (IOException ex) {
             Logger.getLogger(TickerController.class
