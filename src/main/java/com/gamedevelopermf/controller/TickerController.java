@@ -115,7 +115,7 @@ public class TickerController {
         System.out.println(to.getTime().toString());
         System.out.println("!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
          */
-        Stock google = YahooFinance.get(nameTk, from, to, Interval.MONTHLY);
+        Stock google = YahooFinance.get(nameTk, from, to, Interval.MONTHLY);        
         return google;
     }
 
