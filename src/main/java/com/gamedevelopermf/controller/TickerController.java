@@ -58,6 +58,8 @@ public class TickerController {
     private static final String insideFullPath = curPath.toString() + File.separator;//curPath.getParent().toString() + File.separator
     private static final String configFullPath = insideFullPath + PATH_TO_CONFIG;
     private static final String configTempFullPath = insideFullPath + PATH_TO_TEMP_CONFIG;
+    
+    private static boolean tickerDividends = false;
 
 //    public TickerController(){
 //        try {
@@ -94,7 +96,14 @@ public class TickerController {
 
         String newTk = tk.trim();
         return newTk;
-
+    }
+    
+    public static boolean getTCDividend(){
+        return tickerDividends;
+    }
+    
+    public static void setTCDividend(boolean thereAreDividends){
+        tickerDividends = thereAreDividends;
     }
 
     public static List<ArrayList<String>> getListOfStringFromDividends(List<HistoricalDividend> divs) {
@@ -253,6 +262,52 @@ public class TickerController {
         }
         return myTicker;
     }
+    
+    public static ArrayList<RowTicker> getRowTickerArray_DIV(ArrayList<ArrayList<String>> datas) {
+        // Return an Array whose elements are instances of the class RowTicker.
+
+        ArrayList<RowTicker> myTicker = new ArrayList<>();
+        ArrayList<String> headers = getHeaderList(datas);
+        Integer colNumber = headers.size();
+        for (int row = 1; datas.get(row) != null; row++) {
+
+            RowTicker myRowTicker = new RowTicker();
+            ////////////////////////////////////////////////////////////////////
+            // Remove the second row of each case statement (but date one)
+            ////////////////////////////////////////////////////////////////////
+            for (String h : headers) {
+                Integer col = getColNumFromTxt(h, datas);
+                try {
+                    switch (h.toLowerCase().trim()) {
+                        case "data":
+                            String tempData = DateChecker.checkData(datas.get(row).get(col).toString());
+                            Date dateVal = Date.valueOf(tempData);
+                            myRowTicker.setDateTk(dateVal);
+                            break;
+                        case "dividendo":
+                            Double openVal = Double.valueOf(datas.get(row).get(col));
+                            //openVal = openVal * Math.random();
+                            myRowTicker.setDividendsTk(openVal);
+                            break;
+                    }
+                } catch (Exception ex) {
+                    continue;
+                }
+            }
+            if (myRowTicker.getDividendsTk() == null || myRowTicker.getDateTk() == null) {
+                System.out.println("null value");
+            } else {
+                myTicker.add(myRowTicker);
+            }
+            try {
+                datas.get(row + 1);
+            } catch (NullPointerException | IndexOutOfBoundsException e) {
+                break;
+            }
+        }
+        return myTicker;
+    }
+    
 
     public static String makeURL(String tk) {
         // Compose full URL
@@ -492,8 +547,10 @@ public class TickerController {
         List<ArrayList<String>> divData = getListOfStringFromDividends(DwnldDataSourceOne.getListOfDividends(nameTK));
         if (divData == null || divData.isEmpty()) {
             String outMsg = "\'" + nameTK + "\' non ha dividendi.";
+            setTCDividend(false);
             OutputMessage.setOutputText(outMsg, txtField, 2);
         } else {
+            setTCDividend(true);
             String[] head = new String[2];
             head[0] = "Data";
             head[1] = "Dividendo";
@@ -585,5 +642,7 @@ public class TickerController {
          */
         return myAnnualTicker;
     }
+    
+    
 
 }

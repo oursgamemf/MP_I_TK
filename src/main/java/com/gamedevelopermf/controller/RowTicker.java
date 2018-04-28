@@ -19,6 +19,7 @@ public class RowTicker {
     private Double closeTk;
     private Double volumeTk;
     private Double adjCloseTk;
+    private Double dividends;
 
     public Date getDateTk() {
         return dateTk;
@@ -76,5 +77,11 @@ public class RowTicker {
         this.adjCloseTk = adjCloseTk;
     }
     
-    
+    public Double getDividendsTk() {
+        return dividends;
+    }
+
+    public void setDividendsTk(Double divids) {
+        this.dividends = divids;
+    }
 }

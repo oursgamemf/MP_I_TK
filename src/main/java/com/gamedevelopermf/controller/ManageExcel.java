@@ -203,7 +203,7 @@ public class ManageExcel {
         }
     }
 
-    public static void createExcel(ArrayList<RowTicker> myTickerDaily, ArrayList<RowTicker> myTickerWeekly, ArrayList<RowTicker> myTicker, String userSavePath, String fileName, JTextField txtField) {
+    public static void createExcel(ArrayList<RowTicker> myTicker_DIV, ArrayList<RowTicker> myTickerDaily, ArrayList<RowTicker> myTickerWeekly, ArrayList<RowTicker> myTicker, String userSavePath, String fileName, JTextField txtField) {
         Workbook myWb = new XSSFWorkbook();
         CreationHelper myCreateHelper = myWb.getCreationHelper();
 
@@ -223,6 +223,11 @@ public class ManageExcel {
         ArrayList<RowTicker> myAnnualTicker = getAnnualTicker(myTicker);
         String myAnnualSheetName = "Annuale";
         addSheet2Excel(myWb, myCreateHelper, myAnnualSheetName, myAnnualTicker);
+        
+        if (myTicker_DIV != null){
+            String myDividendsSheetName = "Dividendi";
+            addSheet2Excel(myWb, myCreateHelper, myDividendsSheetName, myTicker_DIV);
+        }
 
         // Write the output to a file
         String outputFilePath = userSavePath + File.separator + fileName + ".xlsx";
@@ -263,7 +268,7 @@ public class ManageExcel {
         return exists;
     }
 
-    public static void modifyExcel(ArrayList<RowTicker> myTickerDaily, ArrayList<RowTicker> myTickerWeekly, ArrayList<RowTicker> myTicker, String userSavePath, String fileName, JTextField txtField) {
+    public static void modifyExcel(ArrayList<RowTicker> myTicker_DIV ,ArrayList<RowTicker> myTickerDaily, ArrayList<RowTicker> myTickerWeekly, ArrayList<RowTicker> myTicker, String userSavePath, String fileName, JTextField txtField) {
 
         String inputFilePath = userSavePath + File.separator + fileName + ".xlsx";
 
@@ -309,6 +314,12 @@ public class ManageExcel {
         Sheet mySheet4 = workbook.getSheet("Annuale");
         ArrayList<RowTicker> myAnnualTicker = getAnnualTicker(myTicker);
         modifySheet2Excel(workbook, myCrHelper, mySheet4, myAnnualTicker);
+        
+        if (myTicker_DIV != null){
+            Sheet mySheet5 = workbook.getSheet("Dividendi");
+            modifySheet2Excel(workbook, myCrHelper, mySheet5, myTicker_DIV);
+        }
+        
 
         XSSFFormulaEvaluator.evaluateAllFormulaCells(workbook);
             
