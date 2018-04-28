@@ -28,6 +28,7 @@ import com.gamedevelopermf.controller.RowChoosenTks;
 import com.gamedevelopermf.controller.SelfDownloadCaller;
 import static com.gamedevelopermf.controller.TickerController.sortTicker;
 import java.io.FileOutputStream;
+import java.io.FilenameFilter;
 import java.io.OutputStreamWriter;
 import java.sql.Date;
 import javax.swing.JTable;
@@ -152,13 +153,14 @@ public class ViewTicker extends javax.swing.JFrame {
         });
         jSplitPane4.setLeftComponent(jButton1);
 
-        jButton2.setText("Avvia Scaricamento");
+        jButton2.setText("Avvia scaricamento");
         jButton2.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 jButton2ActionPerformed(evt);
             }
         });
         jSplitPane4.setRightComponent(jButton2);
+        jButton2.getAccessibleContext().setAccessibleName("Avvia_scaricamento");
 
         jSplitPane3.setRightComponent(jSplitPane4);
 
@@ -311,22 +313,17 @@ public class ViewTicker extends javax.swing.JFrame {
 
 
     private void jButton2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton2ActionPerformed
+        // avvia scaricamento
         // TODO add your handling code here:
         OutputMessage.setOutputText("", jTextField3);
         String tickerName = jTextField1.getText().trim().toUpperCase();
         downloadTicker(tickerName);
-
+        
+        // elabAllCSVinFolder();
     }//GEN-LAST:event_jButton2ActionPerformed
 
-    private void jButton3ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton3ActionPerformed
-        OutputMessage.setOutputText("", jTextField3);
-        String[] selTks = getTickersFromTable(myTable);
-        for (String tks : selTks) {
-            downloadTicker(tks);
-        }
-    }//GEN-LAST:event_jButton3ActionPerformed
-
     private void jButton4ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton4ActionPerformed
+
         // TODO add your handling code here:
         String[] Tks2Remove = removeRowFromTable(myTable);
         for (String tk : Tks2Remove) {
@@ -335,7 +332,64 @@ public class ViewTicker extends javax.swing.JFrame {
         OutputMessage.setOutputText("", jTextField3);
         fillTableFromDB(choosedTKTable, myStmtDB, myTable);
 
+
     }//GEN-LAST:event_jButton4ActionPerformed
+
+    private void elabAllCSVinFolder() {
+        String path = TickerController.getInsideFullPath();
+        System.out.println(path);
+        File dir = new File(path);
+        File[] files = dir.listFiles(new FilenameFilter() {
+            public boolean accept(File dir, String name) {
+                String temp = name.toLowerCase();
+                if (temp.endsWith("_w.csv")) {
+                    return true;
+                } else {
+                    return false;
+                }
+            }
+        });
+        for (File f : files) {
+            String tkName = f.getName().substring(0, f.getName().length()-6);
+            System.out.println(tkName);
+            // get Ticker object with daily datas
+            ArrayList<ArrayList<String>> data_D = getAllDataFromTKFile(tkName + "_D", ',');
+            System.out.println(tkName + "_D");
+            ArrayList<RowTicker> myTicker_D = getRowTickerArray(data_D);
+            ArrayList<RowTicker> mySortedTicker_D = sortTicker(myTicker_D);
+            // get Ticker object with weekly datas
+            ArrayList<ArrayList<String>> data_W = getAllDataFromTKFile(tkName + "_W", ',');
+            ArrayList<RowTicker> myTicker_W = getRowTickerArray(data_W);
+            ArrayList<RowTicker> mySortedTicker_W = sortTicker(myTicker_W);
+            // get Ticker object with monthly datas
+            ArrayList<ArrayList<String>> data = getAllDataFromTKFile(tkName, ',');
+            ArrayList<RowTicker> myTicker = getRowTickerArray(data);
+            ArrayList<RowTicker> mySortedTicker = sortTicker(myTicker);
+            // Add Choosen TK
+            ArrayList<RowChoosenTks> information = new ArrayList<>();
+            RowChoosenTks myRowCh = TickerController.addTkChoosenInOBJ(myStmtDB, choosedTKTable, tkName);
+            information.add(myRowCh);
+            Boolean allIn = myStmtDB.insRowChoosenTKinDB(information, queryToInsChTK, choosedTKTable);
+            if (allIn) {
+                // If data are correctly setted in the DB add the Row Into the table
+            }
+            boolean fileAlreadyExists = checkIfExists(tkName, outputExcelFile);
+            if (fileAlreadyExists) {
+                ManageExcel.modifyExcel(mySortedTicker_D, mySortedTicker_W, mySortedTicker, outputExcelFile, tkName, jTextField3);
+            } else {
+                ManageExcel.createExcel(mySortedTicker_D, mySortedTicker_W, mySortedTicker, outputExcelFile, tkName, jTextField3);
+                //TickerController.addTkChoosenInOBJ();
+            }
+        }
+    }
+
+    private void jButton3ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton3ActionPerformed
+        OutputMessage.setOutputText("", jTextField3);
+        String[] selTks = getTickersFromTable(myTable);
+        for (String tks : selTks) {
+            downloadTicker(tks);
+        }
+    }//GEN-LAST:event_jButton3ActionPerformed
 
     private void buttonEnabling() {
         if (outputExcelFile.equals("none")) {
@@ -352,7 +406,7 @@ public class ViewTicker extends javax.swing.JFrame {
             jButton2.setEnabled(true);
         }
     }
-    
+
     public void downloadTicker(String tkName) {
         Boolean isWebConn = TickerController.getWebConnection();
         if (isWebConn) {
@@ -403,11 +457,11 @@ public class ViewTicker extends javax.swing.JFrame {
             String myTKs = TickerController.makeURL(tkName);
             TickerController.searchSaveTK(myTKs, tkName, jTextField3);
             // GEt ticker with daily data
-            ArrayList<ArrayList<String>> data_D = getAllDataFromTKFile(tkName+"_D", ',');
+            ArrayList<ArrayList<String>> data_D = getAllDataFromTKFile(tkName + "_D", ',');
             ArrayList<RowTicker> myTicker_D = getRowTickerArray(data_D);
             ArrayList<RowTicker> mySortedTicker_D = sortTicker(myTicker_D);
             // GEt ticker with weekly data
-            ArrayList<ArrayList<String>> data_W = getAllDataFromTKFile(tkName+"_W", ',');
+            ArrayList<ArrayList<String>> data_W = getAllDataFromTKFile(tkName + "_W", ',');
             ArrayList<RowTicker> myTicker_W = getRowTickerArray(data_W);
             ArrayList<RowTicker> mySortedTicker_W = sortTicker(myTicker_W);
             // GEt ticker with montlyy data
@@ -428,7 +482,7 @@ public class ViewTicker extends javax.swing.JFrame {
             if (fileAlreadyExists) {
                 ManageExcel.modifyExcel(mySortedTicker_D, mySortedTicker_W, mySortedTicker, outputExcelFile, tkName, jTextField3);
             } else {
-                ManageExcel.createExcel(mySortedTicker_D, mySortedTicker_W,mySortedTicker, outputExcelFile, tkName, jTextField3);
+                ManageExcel.createExcel(mySortedTicker_D, mySortedTicker_W, mySortedTicker, outputExcelFile, tkName, jTextField3);
                 //TickerController.addTkChoosenInOBJ();
             }
 

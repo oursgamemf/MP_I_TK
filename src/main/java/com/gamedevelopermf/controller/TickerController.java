@@ -33,6 +33,9 @@ import yahoofinance.Stock;
 import yahoofinance.YahooFinance;
 import yahoofinance.histquotes.Interval;
 import static com.gamedevelopermf.controller.ManageExcel.getAllDataFromFile;
+import java.net.CookieHandler;
+import java.net.CookieManager;
+import java.net.CookiePolicy;
 import java.text.SimpleDateFormat;
 import yahoofinance.histquotes2.HistoricalDividend;
 
@@ -94,78 +97,12 @@ public class TickerController {
 
     }
 
-    public static Stock testYahooAPI() throws IOException {
-        Calendar from = Calendar.getInstance();
-        Calendar to = Calendar.getInstance();
-        from.add(Calendar.YEAR, -100); // from 5 years ago
-
-        Stock google = YahooFinance.get("PHAU.MI", from, to, Interval.MONTHLY);
-        return google;
-    }
-
-    public static Stock yahooAPI_MONTH(String nameTk) throws IOException {
-        Calendar from = Calendar.getInstance();
-        Calendar to = Calendar.getInstance();
-        //from.add(Calendar.YEAR, -10); // from 5 years ago
-        from.set(1800, 01, 01);
-        //from.set(2016, 01, 01);
-        /*
-        System.out.println("!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
-        System.out.println(from.getTime().toString());
-        System.out.println(to.getTime().toString());
-        System.out.println("!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
-         */
-        Stock google = YahooFinance.get(nameTk, from, to, Interval.MONTHLY);        
-        return google;
-    }
-
-    public static Stock yahooAPI_WEEK(String nameTk) throws IOException {
-        Calendar from = Calendar.getInstance();
-        Calendar to = Calendar.getInstance();
-        //from.add(Calendar.YEAR, -10); // from 5 years ago
-        from.set(1800, 01, 01);
-        //from.set(2016, 01, 01);
-        /*
-        System.out.println("!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
-        System.out.println(from.getTime().toString());
-        System.out.println(to.getTime().toString());
-        System.out.println("!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
-         */
-        Stock google = YahooFinance.get(nameTk, from, to, Interval.WEEKLY);
-        return google;
-    }
-
-    public static Stock yahooAPI_DAY(String nameTk) throws IOException {
-        Calendar from = Calendar.getInstance();
-        Calendar to = Calendar.getInstance();
-        //from.add(Calendar.YEAR, -10); // from 5 years ago
-        from.set(1800, 01, 01);
-        //from.set(2016, 01, 01);
-        /*
-        System.out.println("!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
-        System.out.println(from.getTime().toString());
-        System.out.println(to.getTime().toString());
-        System.out.println("!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
-         */
-        Stock google = YahooFinance.get(nameTk, from, to, Interval.DAILY);
-        return google;
-    }
-
-    public static List<HistoricalDividend> getListOfDividends(String nameTk) throws IOException {
-        Calendar from = Calendar.getInstance();
-        Calendar to = Calendar.getInstance();
-        from.set(1800, 01, 01);
-        Stock google = YahooFinance.get(nameTk, from, to, Interval.DAILY);
-        List<HistoricalDividend> dividend = google.getDividendHistory(from, to);
-        return dividend;
-    }
-
     public static List<ArrayList<String>> getListOfStringFromDividends(List<HistoricalDividend> divs) {
         if (divs.isEmpty()) {
             return null;
         }
         List<ArrayList<String>> output = new ArrayList<ArrayList<String>>();
-        
+
         SimpleDateFormat formatCal = new SimpleDateFormat();
         String formattedData = new String();
         for (HistoricalDividend div : divs) {
@@ -211,6 +148,7 @@ public class TickerController {
     public static ArrayList<Object> runMeAtStart() {
         //Linux
         //.getParent()
+
         ArrayList<Object> loadSet = new ArrayList<>();
         ArrayList<ArrayList<String>> configData = getAllDataFromFile(configFullPath, ';');
         DBtkEvo sessionDB = new DBtkEvo();
@@ -239,6 +177,8 @@ public class TickerController {
         loadSet.add(configData.get(7).get(1));
         loadSet.add(configData.get(8).get(1));
 
+        CookieHandler.setDefault(new CookieManager(null, CookiePolicy.ACCEPT_ALL));
+        
         return loadSet;
     }
 
@@ -256,46 +196,55 @@ public class TickerController {
             ////////////////////////////////////////////////////////////////////
             for (String h : headers) {
                 Integer col = getColNumFromTxt(h, datas);
-                switch (h.toLowerCase().trim()) {
-                    case "date":
-                        String tempData = DateChecker.checkData(datas.get(row).get(col).toString());
-                        Date dateVal = Date.valueOf(tempData);
-                        myRowTicker.setDateTk(dateVal);
-                        break;
-                    case "open":
-                        Double openVal = Double.valueOf(datas.get(row).get(col));
-                        //openVal = openVal * Math.random();
-                        myRowTicker.setOpenTk(openVal);
-                        break;
-                    case "high":
-                        Double highVal = Double.valueOf(datas.get(row).get(col));
-                        //highVal = highVal * Math.random();
-                        myRowTicker.setHighTk(highVal);
-                        break;
-                    case "low":
-                        Double lowVal = Double.valueOf(datas.get(row).get(col));
-                        //lowVal = lowVal * Math.random();
-                        myRowTicker.setLowTk(lowVal);
-                        break;
-                    case "close":
-                        Double closeVal = Double.valueOf(datas.get(row).get(col));
-                        //closeVal = closeVal * Math.random();
-                        myRowTicker.setCloseTk(closeVal);
-                        break;
-                    case "volume":
-                        Double volumeVal = Double.valueOf(datas.get(row).get(col));
-                        //volumeVal = volumeVal * Math.random();
-                        myRowTicker.setVolumeTk(volumeVal);
-                        break;
-                    case "adj close":
-                        Double adjCloseVal = Double.valueOf(datas.get(row).get(col));
-                        //adjCloseVal = adjCloseVal * Math.random();
-                        myRowTicker.setAdjCloseTk(adjCloseVal);
-                        break;
+                try {
+                    switch (h.toLowerCase().trim()) {
+                        case "date":
+                            String tempData = DateChecker.checkData(datas.get(row).get(col).toString());
+                            Date dateVal = Date.valueOf(tempData);
+                            myRowTicker.setDateTk(dateVal);
+                            break;
+                        case "open":
+                            Double openVal = Double.valueOf(datas.get(row).get(col));
+                            //openVal = openVal * Math.random();
+                            myRowTicker.setOpenTk(openVal);
+                            break;
+                        case "high":
+                            Double highVal = Double.valueOf(datas.get(row).get(col));
+                            //highVal = highVal * Math.random();
+                            myRowTicker.setHighTk(highVal);
+                            break;
+                        case "low":
+                            Double lowVal = Double.valueOf(datas.get(row).get(col));
+                            //lowVal = lowVal * Math.random();
+                            myRowTicker.setLowTk(lowVal);
+                            break;
+                        case "close":
+                            Double closeVal = Double.valueOf(datas.get(row).get(col));
+                            //closeVal = closeVal * Math.random();
+                            myRowTicker.setCloseTk(closeVal);
+                            break;
+                        case "volume":
+                            Double volumeVal = Double.valueOf(datas.get(row).get(col));
+                            //volumeVal = volumeVal * Math.random();
+                            myRowTicker.setVolumeTk(volumeVal);
+                            break;
+                        case "adj close":
+                            Double adjCloseVal = Double.valueOf(datas.get(row).get(col));
+                            //adjCloseVal = adjCloseVal * Math.random();
+                            myRowTicker.setAdjCloseTk(adjCloseVal);
+                            break;
+                    }
+                } catch (Exception ex) {
+                    continue;
                 }
             }
-
-            myTicker.add(myRowTicker);
+            if (myRowTicker.getCloseTk() == null || myRowTicker.getDateTk() == null
+                    || myRowTicker.getHighTk() == null || myRowTicker.getLowTk() == null
+                    || myRowTicker.getOpenTk() == null || myRowTicker.getVolumeTk() == null) {
+                System.out.println("null value");
+            } else {
+                myTicker.add(myRowTicker);
+            }
             try {
                 datas.get(row + 1);
             } catch (NullPointerException | IndexOutOfBoundsException e) {
@@ -404,6 +353,7 @@ public class TickerController {
 
         //String[] mtStr = null;// {"asd","d","f","ff","vv"};
         List<String[]> tkDataMatrix = new ArrayList<String[]>();
+
         //tkDataMatrix.add(mtStr);
         try {
             List myTKList = tkStock.getHistory();
@@ -500,7 +450,7 @@ public class TickerController {
 
     public static boolean writeCSV(String filename, List<ArrayList<String>> sourceData, String[] header) {
         if (sourceData.get(0).size() != header.length) {
-            System.out.println("-----> " +sourceData.get(0).size());
+            System.out.println("-----> " + sourceData.get(0).size());
             System.out.println("CSV NOT CREATED, header nd data length mismatch");
             return false;
         }
@@ -530,39 +480,26 @@ public class TickerController {
         String pathNameDwlCSV_WEEK = insideFullPath + nameTK.trim() + "_W.csv";
         String pathNameDwlCSV_DAY = insideFullPath + nameTK.trim() + "_D.csv";
         File myFile = new File(pathNameDwlCSV_MONTH);
-        try {
-            Stock myTKdatas_M = yahooAPI_MONTH(nameTK);
-            List<String[]> outputdata_M = getMatrixData(myTKdatas_M);
-            writeCSV(pathNameDwlCSV_MONTH, outputdata_M);
-
-            Stock myTKdatas_W = yahooAPI_WEEK(nameTK);
-            List<String[]> outputdata_W = getMatrixData(myTKdatas_W);
-            writeCSV(pathNameDwlCSV_WEEK, outputdata_W);
-
-            Stock myTKdatas_D = yahooAPI_DAY(nameTK);
-            List<String[]> outputdata_D = getMatrixData(myTKdatas_D);
-            writeCSV(pathNameDwlCSV_DAY, outputdata_D);
-
-            List<ArrayList<String>> divData = getListOfStringFromDividends(getListOfDividends(nameTK));
-            if (divData == null || divData.isEmpty()) {
-                String outMsg = "\'" + nameTK + "\' non ha dividendi.";
-                OutputMessage.setOutputText(outMsg, txtField, 2);
-            }
-            else{
-              String[] head = new String[2];
-              head[0] = "Data";
-              head[1] = "Dividendo";
-              writeCSV(pathNameDwlCSV_DIV,divData,head);
-            }
-            //
-
-        } catch (IOException ex) {
-            Logger.getLogger(TickerController.class
-                    .getName()).log(Level.SEVERE, null, ex);
-            // ("Unable to find this Ticker, correct it please.");
-            String outMsg = "Impossibile scaricare il file: \'" + nameTK + "\'. Ticker non valido";
+        Stock myTKdatas_M = DwnldDataSourceOne.yahooAPI_MONTH(nameTK); // ("Unable to find this Ticker, correct it please.");
+        List<String[]> outputdata_M = getMatrixData(myTKdatas_M);
+        writeCSV(pathNameDwlCSV_MONTH, outputdata_M);
+        Stock myTKdatas_W = DwnldDataSourceOne.yahooAPI_WEEK(nameTK);
+        List<String[]> outputdata_W = getMatrixData(myTKdatas_W);
+        writeCSV(pathNameDwlCSV_WEEK, outputdata_W);
+        Stock myTKdatas_D = DwnldDataSourceOne.yahooAPI_DAY(nameTK);
+        List<String[]> outputdata_D = getMatrixData(myTKdatas_D);
+        writeCSV(pathNameDwlCSV_DAY, outputdata_D);
+        List<ArrayList<String>> divData = getListOfStringFromDividends(DwnldDataSourceOne.getListOfDividends(nameTK));
+        if (divData == null || divData.isEmpty()) {
+            String outMsg = "\'" + nameTK + "\' non ha dividendi.";
             OutputMessage.setOutputText(outMsg, txtField, 2);
+        } else {
+            String[] head = new String[2];
+            head[0] = "Data";
+            head[1] = "Dividendo";
+            writeCSV(pathNameDwlCSV_DIV, divData, head);
         }
+        //
 
         try {
             URL myUrl = new URL(fileUrl);
