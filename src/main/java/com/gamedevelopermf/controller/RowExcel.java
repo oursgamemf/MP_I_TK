@@ -199,24 +199,27 @@ public class RowExcel {
         for (RowTicker myRowTk : myTicker) {
             isLast = row == rowsNum;
             Row myRow = mySheet.getRow(row);
-            if (myRow == null || myRow.getCell(0) == null || myRow.getCell(1) == null || myRow.getCell(2) == null || myRow.getCell(3) == null) {
-                myRow = mySheet.createRow(row);
-                if(!isDividendsSheet){
+            
+            if(!isDividendsSheet){
+                if (myRow == null || myRow.getCell(0) == null || myRow.getCell(1) == null || myRow.getCell(2) == null || myRow.getCell(3) == null) {
+                    myRow = mySheet.createRow(row);
                     addRow2Excel(myWb, myCrHelper, myRow, myRowTk, isLast);
                 }else{
-                    addRow2Excel_DIV(myWb, myCrHelper, myRow, myRowTk, isLast);
-                }
-            } else {
-                if(!isDividendsSheet){
                     modifyRow2Excel(myWb, myCrHelper, myRowTk, myRow, isLast);
+                }
+            }else{
+                if (myRow == null || myRow.getCell(0) == null || myRow.getCell(1) == null) {
+                    myRow = mySheet.createRow(row);
+                    addRow2Excel_DIV(myWb, myCrHelper, myRow, myRowTk, isLast);
                 }else{
                     modifyRow2Excel_DIV(myWb, myCrHelper, myRowTk, myRow, isLast);
                 }
             }
+            
             row += 1;
         }
         // Test
-        while ((mySheet.getRow(row) != null)) {
+        /*while ((mySheet.getRow(row) != null)) {
             if ((mySheet.getRow(row).getCell(0)) == null) {
                 break;
             } else {
@@ -226,7 +229,7 @@ public class RowExcel {
                 mySheet.getRow(row).getCell(3).setCellValue("");
                 row += 1;
             }
-        }
+        }*/
         // end test
         mySheet.autoSizeColumn(0, false);
     }

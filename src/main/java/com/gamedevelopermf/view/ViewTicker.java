@@ -26,6 +26,7 @@ import java.util.logging.Logger;
 import javax.swing.JFileChooser;
 import com.gamedevelopermf.controller.RowChoosenTks;
 import com.gamedevelopermf.controller.SelfDownloadCaller;
+import static com.gamedevelopermf.controller.TickerController.getRowTickerArray_DIV;
 import static com.gamedevelopermf.controller.TickerController.sortTicker;
 import java.io.FileOutputStream;
 import java.io.FilenameFilter;
@@ -365,6 +366,14 @@ public class ViewTicker extends javax.swing.JFrame {
             ArrayList<ArrayList<String>> data = getAllDataFromTKFile(tkName, ',');
             ArrayList<RowTicker> myTicker = getRowTickerArray(data);
             ArrayList<RowTicker> mySortedTicker = sortTicker(myTicker);
+            // get Ticker object with dividends datas
+            ArrayList<RowTicker> mySortedTicker_DIV = null;
+            if(TickerController.getTCDividend()==true){
+                ArrayList<ArrayList<String>> data_DIV = getAllDataFromTKFile(tkName + "_DIV", ',');
+                ArrayList<RowTicker> myTicker_DIV = getRowTickerArray_DIV(data_DIV);
+                mySortedTicker_DIV = sortTicker(myTicker_DIV);
+            }
+            
             // Add Choosen TK
             ArrayList<RowChoosenTks> information = new ArrayList<>();
             RowChoosenTks myRowCh = TickerController.addTkChoosenInOBJ(myStmtDB, choosedTKTable, tkName);
@@ -375,9 +384,9 @@ public class ViewTicker extends javax.swing.JFrame {
             }
             boolean fileAlreadyExists = checkIfExists(tkName, outputExcelFile);
             if (fileAlreadyExists) {
-                ManageExcel.modifyExcel(mySortedTicker_D, mySortedTicker_W, mySortedTicker, outputExcelFile, tkName, jTextField3);
+                ManageExcel.modifyExcel(mySortedTicker_DIV, mySortedTicker_D, mySortedTicker_W, mySortedTicker, outputExcelFile, tkName, jTextField3);
             } else {
-                ManageExcel.createExcel(mySortedTicker_D, mySortedTicker_W, mySortedTicker, outputExcelFile, tkName, jTextField3);
+                ManageExcel.createExcel(mySortedTicker_DIV, mySortedTicker_D, mySortedTicker_W, mySortedTicker, outputExcelFile, tkName, jTextField3);
                 //TickerController.addTkChoosenInOBJ();
             }
         }
@@ -425,6 +434,13 @@ public class ViewTicker extends javax.swing.JFrame {
             ArrayList<ArrayList<String>> data = getAllDataFromTKFile(tkName, ',');
             ArrayList<RowTicker> myTicker = getRowTickerArray(data);
             ArrayList<RowTicker> mySortedTicker = sortTicker(myTicker);
+            // get Ticker object with dividends datas
+            ArrayList<RowTicker> mySortedTicker_DIV = null;
+            if(TickerController.getTCDividend()==true){
+                ArrayList<ArrayList<String>> data_DIV = getAllDataFromTKFile(tkName + "_DIV", ',');
+                ArrayList<RowTicker> myTicker_DIV = getRowTickerArray_DIV(data_DIV);
+                mySortedTicker_DIV = sortTicker(myTicker_DIV);
+            }
             // Add Choosen TK
             ArrayList<RowChoosenTks> information = new ArrayList<>();
             RowChoosenTks myRowCh = TickerController.addTkChoosenInOBJ(myStmtDB, choosedTKTable, tkName);
@@ -437,9 +453,9 @@ public class ViewTicker extends javax.swing.JFrame {
 //            ManageExcel.createExcel(myTicker, outputExcelFile, tickerName);
             boolean fileAlreadyExists = checkIfExists(tkName, outputExcelFile);
             if (fileAlreadyExists) {
-                ManageExcel.modifyExcel(mySortedTicker_D, mySortedTicker_W, mySortedTicker, outputExcelFile, tkName, jTextField3);
+                ManageExcel.modifyExcel(mySortedTicker_DIV, mySortedTicker_D, mySortedTicker_W, mySortedTicker, outputExcelFile, tkName, jTextField3);
             } else {
-                ManageExcel.createExcel(mySortedTicker_D, mySortedTicker_W, mySortedTicker, outputExcelFile, tkName, jTextField3);
+                ManageExcel.createExcel(mySortedTicker_DIV, mySortedTicker_D, mySortedTicker_W, mySortedTicker, outputExcelFile, tkName, jTextField3);
                 //TickerController.addTkChoosenInOBJ();
             }
 
@@ -464,10 +480,17 @@ public class ViewTicker extends javax.swing.JFrame {
             ArrayList<ArrayList<String>> data_W = getAllDataFromTKFile(tkName + "_W", ',');
             ArrayList<RowTicker> myTicker_W = getRowTickerArray(data_W);
             ArrayList<RowTicker> mySortedTicker_W = sortTicker(myTicker_W);
-            // GEt ticker with montlyy data
+            // Get ticker with monthly data
             ArrayList<ArrayList<String>> data = getAllDataFromTKFile(tkName, ',');
             ArrayList<RowTicker> myTicker = getRowTickerArray(data);
             ArrayList<RowTicker> mySortedTicker = sortTicker(myTicker);
+            // GEt ticker with weekly data
+            ArrayList<RowTicker> mySortedTicker_DIV = null;
+            if(TickerController.getTCDividend()==true){
+                ArrayList<ArrayList<String>> data_DIV = getAllDataFromTKFile(tkName + "_DIV", ',');
+                ArrayList<RowTicker> myTicker_DIV = getRowTickerArray_DIV(data_DIV);
+                mySortedTicker_DIV = sortTicker(myTicker_DIV);
+            }
             // Add Choosen TK
             //get il TK
             RowChoosenTks rct = myStmtDB.getRowChoosenDBData(choosedTKTable, tkName);
@@ -480,9 +503,9 @@ public class ViewTicker extends javax.swing.JFrame {
             // Update last download
             boolean fileAlreadyExists = checkIfExists(tkName, outputExcelFile);
             if (fileAlreadyExists) {
-                ManageExcel.modifyExcel(mySortedTicker_D, mySortedTicker_W, mySortedTicker, outputExcelFile, tkName, jTextField3);
+                ManageExcel.modifyExcel(mySortedTicker_DIV, mySortedTicker_D, mySortedTicker_W, mySortedTicker, outputExcelFile, tkName, jTextField3);
             } else {
-                ManageExcel.createExcel(mySortedTicker_D, mySortedTicker_W, mySortedTicker, outputExcelFile, tkName, jTextField3);
+                ManageExcel.createExcel(mySortedTicker_DIV, mySortedTicker_D, mySortedTicker_W, mySortedTicker, outputExcelFile, tkName, jTextField3);
                 //TickerController.addTkChoosenInOBJ();
             }
 
