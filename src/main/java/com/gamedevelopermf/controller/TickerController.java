@@ -176,16 +176,10 @@ public class TickerController {
         Boolean testSecDB = sessionDB.createTable(configData.get(4).get(1), configData.get(5).get(1));
 
         loadSet.add(sessionDB);
-        loadSet.add(configData.get(0).get(1));
-        loadSet.add(configData.get(1).get(1));
-        loadSet.add(configData.get(2).get(1));
-        loadSet.add(configData.get(3).get(1));
-        loadSet.add(configData.get(4).get(1));
-        loadSet.add(configData.get(5).get(1));
-        loadSet.add(configData.get(6).get(1));
-        loadSet.add(configData.get(7).get(1));
-        loadSet.add(configData.get(8).get(1));
-
+        for(int kk = 0 ; kk< configData.size();kk++){
+            loadSet.add(configData.get(kk).get(1));
+        }        
+        
         CookieHandler.setDefault(new CookieManager(null, CookiePolicy.ACCEPT_ALL));
         
         return loadSet;

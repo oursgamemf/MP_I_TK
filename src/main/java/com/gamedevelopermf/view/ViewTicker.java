@@ -57,10 +57,11 @@ public class ViewTicker extends javax.swing.JFrame {
         // UI setting at Start
 
         // Inizialize data from config file: Create or COnn DB - Create two tables return the list of config data.
-        myStmtDB = (DBtkEvo) runMeAtStart().get(0);
-        ArrayList<String> setList = new ArrayList<>();
         ArrayList<Object> subSetList = runMeAtStart();
-        for (int ii = 1; ii < runMeAtStart().size(); ii++) {
+        myStmtDB = (DBtkEvo) subSetList.get(0);
+        ArrayList<String> setList = new ArrayList<>();
+        
+        for (int ii = 1; ii < subSetList.size(); ii++) {
             setList.add((String) subSetList.get(ii));
         } // From here setList has all config data
         outputExcelFile = setList.get(8);
@@ -71,6 +72,10 @@ public class ViewTicker extends javax.swing.JFrame {
 
         // Query Insert data in CH TK table
         queryToInsChTK = setList.get(6);
+        
+        // Get Max NumList
+        System.out.println("---->" + setList.get(9));
+        //ManageExcel.MAX_ROW_NUMBER = Integer.parseInt(setList.get(9));
 
         // Initialize the UI
         initComponents();

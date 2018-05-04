@@ -38,6 +38,7 @@ import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 public class ManageExcel {
 
     private static String inputFile;
+    public static int MAX_ROW_NUMBER = 50000;
 
     public static void setInputFile(String inputFile) {
         ManageExcel.inputFile = inputFile;
@@ -89,7 +90,7 @@ public class ManageExcel {
         try (CSVReader reader = new CSVReader(new FileReader(inputFile), sep);) {
             String[] nextLine;
             int numRow = 0;
-            while ((nextLine = reader.readNext()) != null && numRow < 8000) {
+            while ((nextLine = reader.readNext()) != null && numRow < MAX_ROW_NUMBER) {
                 ArrayList<String> allRow = new ArrayList<>();
                 allRow.addAll(Arrays.asList(nextLine));
                 allData.add(allRow);
@@ -112,7 +113,7 @@ public class ManageExcel {
         try (CSVReader reader = new CSVReader(new InputStreamReader(new FileInputStream(csvInputPath)), sep, '"', '|');) {
             String[] nextLine;
             int numRow = 0;
-            while ((nextLine = reader.readNext()) != null && numRow < 8000) {
+            while ((nextLine = reader.readNext()) != null && numRow < MAX_ROW_NUMBER) {
                 ArrayList<String> allRow = new ArrayList<>();
                 allRow.addAll(Arrays.asList(nextLine));
                 allData.add(allRow);
@@ -136,7 +137,7 @@ public class ManageExcel {
         try (CSVReader reader = new CSVReader(new FileReader(csvInputPath), sep);) {
             String[] nextLine;
             int numRow = 0;
-            while ((nextLine = reader.readNext()) != null && numRow < 8000) {
+            while ((nextLine = reader.readNext()) != null && numRow < MAX_ROW_NUMBER) {
                 ArrayList<String> allRow = new ArrayList<>();
                 allRow.addAll(Arrays.asList(nextLine));
                 allData.add(allRow);
